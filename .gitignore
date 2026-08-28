@@ -46,3 +46,20 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Firebase - Arquivos de configuração e opções FlutterFire
+lib/firebase_options.dart
+firebase.json
+.firebaserc
+
+# Firebase - Android (Credenciais e serviços)
+android/app/google-services.json
+
+# Firebase - iOS / macOS (Listas de propriedades com chaves)
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
+
+# Firebase - Chaves de Conta de Serviço e tokens de teste (GCP / Backend)
+*serviceAccountKey*.json
+*service-account*.json
+*.fcm.key
