@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="climapp_cc20262"
+        android:label="Climapp 4CC"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
