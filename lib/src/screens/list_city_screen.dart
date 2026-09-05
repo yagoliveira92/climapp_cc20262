@@ -2,6 +2,7 @@ import 'package:climapp_cc20262/src/controller/list_city_controller.dart';
 import 'package:climapp_cc20262/src/screens/weather_city_screen.dart';
 import 'package:climapp_cc20262/src/widgets/city_tile_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ListCityScreen extends StatefulWidget {
   const ListCityScreen({super.key});
@@ -12,8 +13,6 @@ class ListCityScreen extends StatefulWidget {
 
 class _ListCityScreenState extends State<ListCityScreen> {
   final TextEditingController textController = TextEditingController();
-
-  final ListCityController controller = ListCityController();
 
   @override
   void initState() {
