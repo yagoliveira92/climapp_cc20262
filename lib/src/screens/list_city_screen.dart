@@ -15,10 +15,11 @@ class ListCityScreen extends StatefulWidget {
 
 class _ListCityScreenState extends State<ListCityScreen> {
   final TextEditingController textController = TextEditingController();
-final ListCityController controller = ListCityController(
+  final ListCityController controller = ListCityController(
     deviceInfoService: DeviceInfoService(),
     weatherService: WeatherService(),
   );
+
   @override
   void initState() {
     super.initState();
@@ -36,7 +37,7 @@ final ListCityController controller = ListCityController(
   Widget build(BuildContext context) {
     return Scaffold(
       body: DecoratedBox(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: <Color>[Color(0xFF00457D), Color(0xFF05051F)],
             begin: Alignment.topCenter,
@@ -44,23 +45,54 @@ final ListCityController controller = ListCityController(
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
-            mainAxisSize: .max,
+            mainAxisSize: MainAxisSize.max,
             children: [
-              const SizedBox(height: 25),
+              const SizedBox(height: 35),
+              // Exibição do país no celular
+              ListenableBuilder(
+                listenable: controller,
+                builder: (context, _) {
+                  if (controller.deviceCountry.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.location_on,
+                          color: Color(0xff15ffffff),
+                          size: 18,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'País detectado: ${controller.deviceCountry}',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
               TextField(
                 style: const TextStyle(color: Colors.white),
                 controller: textController,
                 onChanged: controller.filterCities,
                 decoration: const InputDecoration(
-                  fillColor: Color(0xff15ffff),
+                  fillColor: Color(0xff15ffffff),
                   filled: true,
                   hintText: 'Digite uma cidade',
                   hintStyle: TextStyle(color: Colors.white),
                   suffixIcon: Icon(Icons.search, color: Colors.white),
                   border: OutlineInputBorder(
-                    borderSide: .none,
+                    borderSide: BorderSide.none,
                     borderRadius: BorderRadius.all(Radius.circular(30)),
                   ),
                 ),
