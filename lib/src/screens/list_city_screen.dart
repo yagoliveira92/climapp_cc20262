@@ -2,18 +2,23 @@ import 'package:climapp_cc20262/src/controller/list_city_controller.dart';
 import 'package:climapp_cc20262/src/screens/weather_city_screen.dart';
 import 'package:climapp_cc20262/src/widgets/city_tile_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
+import 'package:climapp_cc20262/src/services/device_info_service.dart';
+import 'package:climapp_cc20262/src/services/weather_service.dart';
 
 class ListCityScreen extends StatefulWidget {
   const ListCityScreen({super.key});
 
   @override
-  _ListCityScreenState createState() => _ListCityScreenState();
+  State<ListCityScreen> createState() => _ListCityScreenState();
 }
 
 class _ListCityScreenState extends State<ListCityScreen> {
   final TextEditingController textController = TextEditingController();
-
+final ListCityController controller = ListCityController(
+    deviceInfoService: DeviceInfoService(),
+    weatherService: WeatherService(),
+  );
   @override
   void initState() {
     super.initState();
@@ -49,7 +54,7 @@ class _ListCityScreenState extends State<ListCityScreen> {
                 controller: textController,
                 onChanged: controller.filterCities,
                 decoration: const InputDecoration(
-                  fillColor: Color(0xff15ffffff),
+                  fillColor: Color(0xff15ffff),
                   filled: true,
                   hintText: 'Digite uma cidade',
                   hintStyle: TextStyle(color: Colors.white),

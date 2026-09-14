@@ -9,7 +9,7 @@ class WeatherCityScreen extends StatefulWidget {
   final WeatherForecastModel weatherForecastModel;
 
   @override
-  _WeatherCityScreenState createState() => _WeatherCityScreenState();
+  State<WeatherCityScreen> createState() => _WeatherCityScreenState();
 }
 
 class _WeatherCityScreenState extends State<WeatherCityScreen> {

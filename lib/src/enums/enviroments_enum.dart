@@ -1,3 +1,5 @@
+   // ignore_for_file: non_constant_identifier_names
+
 enum EnviromentEnum {
   constants(
     API_BASE_URL: 'https://api.hgbrasil.com/weather',
