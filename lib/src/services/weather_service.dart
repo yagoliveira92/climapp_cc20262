@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:climapp_cc20262/src/enums/enviroments_enum.dart';
 import 'package:climapp_cc20262/src/models/weather_forecast_model.dart';
@@ -12,17 +14,26 @@ class WeatherService {
     final List<WeatherForecastModel> listCity = [];
 
     for (var city in listCitySearch) {
-      final response = await http.get(
-        Uri.parse(
-          '${enumEnv.API_BASE_URL}?key=${enumEnv.API_KEY}&city_name=$city',
-        ),
-      );
+      final uri =
+          '${enumEnv.API_BASE_URL}?key=${enumEnv.API_KEY}&city_name=$city';
+      final response = await http
+          .get(Uri.parse(uri))
+          .timeout(
+            const Duration(seconds: 5),
+            onTimeout: () {
+              throw TimeoutException(
+                "Deu ruim nas internet, vá botar crédito seu pobre",
+              );
+            },
+          );
       if (response.statusCode >= 200 || response.statusCode < 300) {
         final jsonDecoded = jsonDecode(response.body)['results'];
         final model = WeatherForecastModel.fromJson(jsonDecoded);
         listCity.add(model);
       } else {
-        throw Exception('Erro ao carregar dados');
+        throw HttpException(
+          'Deu ruim no HGBrasil, a culpa não é minha. Código: ${response.statusCode}',
+        );
       }
     }
     return listCity;

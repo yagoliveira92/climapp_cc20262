@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'dart:io';
 
 import 'package:climapp_cc20262/src/models/weather_forecast_model.dart';
 import 'package:climapp_cc20262/src/services/device_info_service.dart';
@@ -12,6 +15,7 @@ class ListCityController extends ChangeNotifier {
   });
 
   final WeatherService weatherService;
+
   final DeviceInfoService deviceInfoService;
 
   String _deviceCountry = '';
@@ -19,6 +23,7 @@ class ListCityController extends ChangeNotifier {
   List<WeatherForecastModel> allCities = [];
   List<WeatherForecastModel> filteredCities = [];
   bool isLoading = true;
+  String errorMessage = '';
 
   final listCitySearch = [
     'Aracaju,SE',
@@ -28,18 +33,28 @@ class ListCityController extends ChangeNotifier {
   ];
   Future<void> loadCities() async {
     isLoading = true;
+    errorMessage = '';
     notifyListeners();
 
-    _deviceCountry = await deviceInfoService.getDeviceCountry();
-
     try {
+      _deviceCountry = await deviceInfoService.getDeviceCountry();
       allCities = await weatherService.getWeatherForecast(listCitySearch);
       filteredCities = List.from(allCities);
+    } on TimeoutException catch (e) {
+      errorMessage =
+          e.message ?? 'Deu ruim nas internet, vá botar crédito seu pobre';
+    } on HttpException catch (e) {
       debugPrint('====================================');
-      debugPrint('Este é o país do celular: $_deviceCountry');
+      errorMessage = e.message;
+      debugPrint(errorMessage);
       debugPrint('====================================');
+    } on SocketException {
+      
+      errorMessage = 'Parece que você está sem conexão com a internet. Verifique sua rede Wi-Fi ou dados móveis e tente novamente.';
     } catch (e) {
-      debugPrint (e.toString());
+      debugPrint('Erro não tratado: $e');
+      
+      errorMessage = 'Parece que você está sem conexão com a internet. Verifique sua rede Wi-Fi ou dados móveis e tente novamente.';
     } finally {
       isLoading = false;
       notifyListeners();

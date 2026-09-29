@@ -39,10 +39,11 @@ class MyApp extends StatelessWidget {
           create: (context) => ListCityController(
             weatherService: context.read<WeatherService>(),
             deviceInfoService: context.read<DeviceInfoService>(),
-          ),
+          )..loadCities(),
         ),
       ],
       child: MaterialApp(
+        navigatorKey: NotificationService().navigatorKey,
         title: 'Climapp',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

@@ -2,9 +2,8 @@ import 'package:climapp_cc20262/src/controller/list_city_controller.dart';
 import 'package:climapp_cc20262/src/screens/weather_city_screen.dart';
 import 'package:climapp_cc20262/src/widgets/city_tile_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import 'package:climapp_cc20262/src/services/device_info_service.dart';
-import 'package:climapp_cc20262/src/services/weather_service.dart';
 
 class ListCityScreen extends StatefulWidget {
   const ListCityScreen({super.key});
@@ -15,21 +14,20 @@ class ListCityScreen extends StatefulWidget {
 
 class _ListCityScreenState extends State<ListCityScreen> {
   final TextEditingController textController = TextEditingController();
-  final ListCityController controller = ListCityController(
-    deviceInfoService: DeviceInfoService(),
-    weatherService: WeatherService(),
-  );
+  
 
   @override
   void initState() {
     super.initState();
-    controller.loadCities();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ListCityController>().loadCities();
+    });
+
   }
 
   @override
   void dispose() {
     textController.dispose();
-    controller.dispose();
     super.dispose();
   }
 
@@ -50,11 +48,10 @@ class _ListCityScreenState extends State<ListCityScreen> {
             mainAxisSize: MainAxisSize.max,
             children: [
               const SizedBox(height: 35),
-              // Exibição do país no celular
-              ListenableBuilder(
-                listenable: controller,
-                builder: (context, _) {
-                  if (controller.deviceCountry.isEmpty) {
+              // Exibição do país no telemóvel
+              Consumer<ListCityController>(
+                builder: (context, cityCtrl, _) {
+                  if (cityCtrl.deviceCountry.isEmpty) {
                     return const SizedBox.shrink();
                   }
                   return Padding(
@@ -64,12 +61,12 @@ class _ListCityScreenState extends State<ListCityScreen> {
                       children: [
                         const Icon(
                           Icons.location_on,
-                          color: Color(0xff15ffffff),
+                          color: Colors.white70,
                           size: 18,
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          'País detectado: ${controller.deviceCountry}',
+                          'País detectado: ${cityCtrl.deviceCountry}',
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 14,
@@ -84,9 +81,11 @@ class _ListCityScreenState extends State<ListCityScreen> {
               TextField(
                 style: const TextStyle(color: Colors.white),
                 controller: textController,
-                onChanged: controller.filterCities,
+                onChanged: (query) {
+                  context.read<ListCityController>().filterCities(query);
+                },
                 decoration: const InputDecoration(
-                  fillColor: Color(0xff15ffffff),
+                  fillColor: Color(0x15FFFFFF),
                   filled: true,
                   hintText: 'Digite uma cidade',
                   hintStyle: TextStyle(color: Colors.white),
@@ -99,12 +98,70 @@ class _ListCityScreenState extends State<ListCityScreen> {
               ),
               const SizedBox(height: 15),
               Expanded(
-                child: ListenableBuilder(
-                  listenable: controller,
-                  builder: (context, _) {
+                child: Consumer<ListCityController>(
+                  builder: (context, controller, child) {
+                    // 1. Se estiver carregando, mostra a rodinha
                     if (controller.isLoading) {
                       return const Center(child: CircularProgressIndicator());
                     }
+
+                 
+                    if (controller.errorMessage.isNotEmpty) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.wifi_off_rounded,
+                                size: 72,
+                                color: Colors.white70,
+                              ),
+                              const SizedBox(height: 16),
+                              const Text(
+                                'Ops! Problema de conexão',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                controller.errorMessage,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  controller.loadCities();
+                                },
+                                icon: const Icon(Icons.refresh),
+                                label: const Text('Tentar novamente'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: const Color(0xFF00457D),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 10,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+
+                    // 3. Se deu tudo certo, mostra a lista de cidades
                     return ListView.builder(
                       itemCount: controller.filteredCities.length,
                       itemBuilder: (context, index) {
