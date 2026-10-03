@@ -36,7 +36,7 @@ class MainActivity : FlutterActivity() {
         return if (localeCountry.isNotBlank()) {
             localeCountry.uppercase(Locale.ROOT)
         } else {
-            "Deu Ruim"
+            ""
         }
     }
 }

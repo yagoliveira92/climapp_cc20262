@@ -15,46 +15,66 @@ class WelcomeScreen extends StatelessWidget {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            spacing: 40,
-            children: [
-              SizedBox(height: 30),
-              Image.asset("assets/logo_climapp.png", width: 200),
-              Image.asset("assets/ilustracao_home.png", width: 250),
-              Text(
-                'Boas-vindas!',
-                style: TextStyle(color: Colors.white, fontSize: 30),
+        // Rolável em telas baixas (celular pequeno, janela desktop) para não
+        // estourar o layout; em telas altas os Spacers continuam centralizando.
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            padding: EdgeInsets.all(16),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - 32,
               ),
-              Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ListCityScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF7693FF),
-                  ),
-                  child: Row(
-                    spacing: 10,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Entrar',
-                        style: TextStyle(color: Colors.black, fontSize: 25),
+              child: IntrinsicHeight(
+                child: Column(
+                  spacing: 40,
+                  children: [
+                    SizedBox(height: 30),
+                    Image.asset("assets/logo_climapp.png", width: 200),
+                    Image.asset("assets/ilustracao_home.png", width: 250),
+                    Text(
+                      'Boas-vindas!',
+                      style: TextStyle(color: Colors.white, fontSize: 30),
+                    ),
+                    Spacer(),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ListCityScreen(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF7693FF),
+                        ),
+                        child: Row(
+                          spacing: 10,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Entrar',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 25,
+                              ),
+                            ),
+                            Icon(
+                              Icons.arrow_forward,
+                              color: Colors.black,
+                              size: 25,
+                            ),
+                          ],
+                        ),
                       ),
-                      Icon(Icons.arrow_forward, color: Colors.black, size: 25),
-                    ],
-                  ),
+                    ),
+                    Spacer(),
+                  ],
                 ),
               ),
-              Spacer(),
-            ],
+            ),
           ),
         ),
       ),
