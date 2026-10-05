@@ -63,3 +63,8 @@ macos/Runner/GoogleService-Info.plist
 *serviceAccountKey*.json
 *service-account*.json
 *.fcm.key
+
+# Chave local da HG Brasil e atalho de execução
+chave_hgbrasil.txt
+Abrir Climapp.command
+build

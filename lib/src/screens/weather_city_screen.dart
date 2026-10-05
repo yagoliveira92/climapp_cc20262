@@ -37,7 +37,8 @@ class _WeatherCityScreenState extends State<WeatherCityScreen> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Padding(
+        // Rolável para não estourar em telas baixas (celular pequeno, desktop).
+        child: SingleChildScrollView(
           padding: .all(16),
           child: Column(
             crossAxisAlignment: .stretch,

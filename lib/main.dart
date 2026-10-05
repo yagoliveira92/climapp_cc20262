@@ -19,10 +19,19 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  final notificationService = NotificationService();
-  await notificationService.initialize();
+
+  // Se o Firebase não estiver configurado para a plataforma (ex.: web/desktop
+  // sem firebase_options), o app continua funcionando, só sem push.
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    await NotificationService().initialize();
+  } catch (e) {
+    debugPrint('Firebase indisponível, notificações desativadas: $e');
+  }
+
   runApp(const MyApp());
 }
 
@@ -44,6 +53,10 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Climapp',
+        // Chaves globais usadas pelo NotificationService para exibir o
+        // banner de notificação com o app em primeiro plano.
+        navigatorKey: NotificationService().navigatorKey,
+        scaffoldMessengerKey: NotificationService().scaffoldMessengerKey,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           textTheme: GoogleFonts.montserratTextTheme(
