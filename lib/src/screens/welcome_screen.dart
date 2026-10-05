@@ -8,7 +8,7 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: DecoratedBox(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: <Color>[Color(0xFF00457D), Color(0xFF05051F)],
             begin: Alignment.topCenter,
@@ -16,31 +16,33 @@ class WelcomeScreen extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             spacing: 40,
             children: [
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               Image.asset("assets/logo_climapp.png", width: 200),
               Image.asset("assets/ilustracao_home.png", width: 250),
-              Text(
+              const Text(
                 'Boas-vindas!',
                 style: TextStyle(color: Colors.white, fontSize: 30),
               ),
-              Spacer(),
+              const Spacer(),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => ListCityScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const ListCityScreen(),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF7693FF),
+                    backgroundColor: const Color(0xFF7693FF),
                   ),
-                  child: Row(
+                  child: const Row(
                     spacing: 10,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -53,7 +55,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              Spacer(),
+              const Spacer(),
             ],
           ),
         ),

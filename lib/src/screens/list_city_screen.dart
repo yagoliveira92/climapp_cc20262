@@ -1,6 +1,7 @@
 import 'package:climapp_cc20262/src/controller/list_city_controller.dart';
 import 'package:climapp_cc20262/src/screens/weather_city_screen.dart';
 import 'package:climapp_cc20262/src/widgets/city_tile_widget.dart';
+import 'package:climapp_cc20262/src/widgets/error_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,11 +14,6 @@ class ListCityScreen extends StatefulWidget {
 
 class _ListCityScreenState extends State<ListCityScreen> {
   final TextEditingController textController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -67,6 +63,16 @@ class _ListCityScreenState extends State<ListCityScreen> {
                     if (controller.isLoading) {
                       return const Center(child: CircularProgressIndicator());
                     }
+
+                    if (controller.hasError) {
+                      return ErrorView(
+                        message: controller.errorMessage,
+                        onRetry: () {
+                          controller.loadCities();
+                        },
+                      );
+                    }
+
                     return ListView.builder(
                       itemCount: controller.filteredCities.length,
                       itemBuilder: (context, index) {
@@ -74,7 +80,7 @@ class _ListCityScreenState extends State<ListCityScreen> {
                         return CityTileWidget(
                           cityName: city.cityName,
                           icon: city.conditionSlug,
-                          temperature: city.temp,
+                          temperature: int.tryParse(city.temp) ?? 0,
                           onTap: () {
                             Navigator.push(
                               context,

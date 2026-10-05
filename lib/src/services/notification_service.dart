@@ -1,91 +1,100 @@
-// lib/src/services/notification_service.dart
-import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 
 class NotificationService {
-  // Instância singleton para acesso global
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
-
-  // Chave global para permitir navegação sem BuildContext
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   Future<void> initialize() async {
-    // 1. Solicitar permissões (Obrigatório para iOS e Android 13+)
-    NotificationSettings settings = await _fcm.requestPermission(
+    // Solicita permissões ao usuário
+    NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
-      provisional: false,
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      debugPrint('Permissão concedida pelo usuário.');
+      String? token = await _firebaseMessaging.getToken();
+      debugPrint("====================================");
+      debugPrint("FCM TOKEN DO DISPOSITIVO: $token");
+      debugPrint("====================================");
 
-      // 2. Obter o FCM Token na inicialização
-      String? token = await _fcm.getToken();
-      debugPrint('====================================');
-      debugPrint('FCM TOKEN DO DISPOSITIVO: $token');
-      debugPrint('====================================');
-
-      // Escuta caso o token seja renovado pelo Firebase
-      _fcm.onTokenRefresh.listen((newToken) {
-        debugPrint('FCM Token atualizado: $newToken');
-      });
-
-      // 3. Configurar os listeners de eventos
-      _setupMessageHandlers();
-    } else {
-      debugPrint('Permissão negada ou não configurada.');
-    }
-  }
-
-  void _setupMessageHandlers() {
-    // Cenário: Foreground (App aberto na tela)
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint(
-        'Mensagem recebida em Foreground: ${message.notification?.title}',
-      );
-
-      final notification = message.notification;
-      if (notification != null) {
-        // Exibe um alerta ou SnackBar utilizando o contexto global
-        final context = navigatorKey.currentContext;
-        if (context != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${notification.title}\n${notification.body}'),
-              backgroundColor: Colors.blueAccent,
-              duration: const Duration(seconds: 4),
-            ),
+      //notificações com o app em primeiro plano
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        if (message.notification != null) {
+          _showCustomTopNotification(
+            title: message.notification!.title ?? 'Notificação',
+            body: message.notification!.body ?? '',
           );
         }
-      }
-    });
-
-    // Cenário: Background (App minimizado e usuário clica na notificação)
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint('Toque na notificação (Background): ${message.data}');
-      _handleDeepLink(message);
-    });
-
-    // Cenário: Terminated (App fechado e aberto pelo clique na notificação)
-    _fcm.getInitialMessage().then((RemoteMessage? message) {
-      if (message != null) {
-        debugPrint('App inicializado a partir de notificação: ${message.data}');
-        _handleDeepLink(message);
-      }
-    });
+      });
+    }
   }
 
-  void _handleDeepLink(RemoteMessage message) {
-    final city = message.data['city'];
-    if (city != null) {
-      // Navega diretamente para a tela de clima da cidade
-      navigatorKey.currentState?.pushNamed('/weather', arguments: city);
-    }
+  void _showCustomTopNotification({
+    required String title,
+    required String body,
+  }) {
+    final context = navigatorKey.currentContext;
+    if (context == null) return;
+
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    scaffoldMessenger.hideCurrentSnackBar();
+
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        // Posicionamento flutuante configurado para o topo
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(
+          top: MediaQuery.of(context).padding.top + 10,
+          left: 16,
+          right: 16,
+          bottom: MediaQuery.of(context).size.height - 180,
+        ),
+
+        duration: const Duration(seconds: 7),
+        elevation: 8,
+        backgroundColor: Colors.amber.shade800,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Colors.white, width: 1.5),
+        ),
+        content: Row(
+          children: [
+            const Icon(
+              Icons.notifications_active_rounded,
+              color: Colors.white,
+              size: 32,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    body,
+                    style: const TextStyle(fontSize: 14, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
