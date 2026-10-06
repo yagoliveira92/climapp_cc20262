@@ -3,7 +3,6 @@ plugins {
     // START: FlutterFire Configuration
     id("com.google.gms.google-services")
     // END: FlutterFire Configuration
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -40,7 +39,13 @@ android {
         }
     }
 }
+dependencies {
+    // Importa a plataforma BOM do Firebase para gerenciar versões
+    implementation(platform("com.google.firebase:firebase-bom:34.19.0"))
+    // Adiciona a dependência do Firebase Messaging
+    implementation("com.google.firebase:firebase-messaging")
 
+}
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17

@@ -1,8 +1,25 @@
 import 'package:climapp_cc20262/src/screens/list_city_screen.dart';
+import 'package:climapp_cc20262/src/services/device_info_service.dart';
 import 'package:flutter/material.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  final DeviceInfoService _deviceInfoService = DeviceInfoService();
+  String _flagEmoji = '';
+  String _countryCode = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _countryCode = _deviceInfoService.getCountryCode();
+    _flagEmoji = _deviceInfoService.getFlagEmoji(_countryCode);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +40,22 @@ class WelcomeScreen extends StatelessWidget {
               SizedBox(height: 30),
               Image.asset("assets/logo_climapp.png", width: 200),
               Image.asset("assets/ilustracao_home.png", width: 250),
-              Text(
-                'Boas-vindas!',
-                style: TextStyle(color: Colors.white, fontSize: 30),
+
+
+              Column(
+                children: [
+                  Text(
+                    'Boas-vindas!',
+                    style: TextStyle(color: Colors.white, fontSize: 30),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    '$_flagEmoji $_countryCode', // Exibe a bandeira e o código (ex: 🇧🇷 BR)
+                    style: TextStyle(color: Colors.white70, fontSize: 20),
+                  ),
+                ],
               ),
+
               Spacer(),
               SizedBox(
                 width: double.infinity,

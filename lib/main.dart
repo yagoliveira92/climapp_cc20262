@@ -8,7 +8,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
 import 'firebase_options.dart';
 
 @pragma('vm:entry-point')
@@ -25,7 +24,6 @@ Future<void> main() async {
   await notificationService.initialize();
   runApp(const MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -39,11 +37,12 @@ class MyApp extends StatelessWidget {
           create: (context) => ListCityController(
             weatherService: context.read<WeatherService>(),
             deviceInfoService: context.read<DeviceInfoService>(),
-          )..loadCities(),
+          ),
         ),
       ],
       child: MaterialApp(
         title: 'Climapp',
+        navigatorKey: NotificationService().navigatorKey,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           textTheme: GoogleFonts.montserratTextTheme(
