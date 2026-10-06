@@ -1,13 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
-
-import 'package:climapp_cc20262/src/enums/enviroments_enum.dart';
 import 'package:climapp_cc20262/src/models/weather_forecast_model.dart';
 import 'package:climapp_cc20262/src/services/device_info_service.dart';
 import 'package:climapp_cc20262/src/services/weather_service.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class ListCityController extends ChangeNotifier {
   ListCityController({
@@ -19,10 +15,15 @@ class ListCityController extends ChangeNotifier {
   final DeviceInfoService deviceInfoService;
 
   String _deviceCountry = '';
+
   String get deviceCountry => _deviceCountry;
+
   List<WeatherForecastModel> allCities = [];
+
   List<WeatherForecastModel> filteredCities = [];
+
   bool isLoading = true;
+
   String errorMessage = '';
 
   final listCitySearch = [
@@ -31,28 +32,40 @@ class ListCityController extends ChangeNotifier {
     'Salvador,BA',
     'Curitiba,PR',
   ];
+
   Future<void> loadCities() async {
     isLoading = true;
     errorMessage = '';
+
     notifyListeners();
 
-    _deviceCountry = await deviceInfoService.getDeviceCountry();
-
     try {
-      allCities = await weatherService.getWeatherForecast(listCitySearch);
+      _deviceCountry = await deviceInfoService.getDeviceCountry();
+
+      allCities = await weatherService.getWeatherForecast(
+        listCitySearch,
+      );
+
       filteredCities = List.from(allCities);
     } on TimeoutException catch (e) {
       errorMessage =
-          e.message ?? 'Deu ruim nas internet, vá botar crédito seu pobre';
+          e.message ??
+          'A conexão demorou muito para responder. Tente novamente.';
     } on HttpException catch (e) {
-      debugPrint('====================================');
       errorMessage = e.message;
-      debugPrint(errorMessage);
+
+      debugPrint('====================================');
+      debugPrint('Erro HTTP: $e');
       debugPrint('====================================');
     } catch (e) {
-      print(e);
+      errorMessage = 'Não foi possível carregar as cidades.';
+
+      debugPrint('====================================');
+      debugPrint('Erro ao carregar cidades: $e');
+      debugPrint('====================================');
     } finally {
       isLoading = false;
+
       notifyListeners();
     }
   }
@@ -63,10 +76,13 @@ class ListCityController extends ChangeNotifier {
     } else {
       filteredCities = allCities
           .where(
-            (city) => city.cityName.toLowerCase().contains(query.toLowerCase()),
+            (city) => city.cityName
+                .toLowerCase()
+                .contains(query.toLowerCase()),
           )
           .toList();
     }
+
     notifyListeners();
   }
 }
