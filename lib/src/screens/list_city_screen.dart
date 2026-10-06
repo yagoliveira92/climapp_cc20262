@@ -42,6 +42,26 @@ class _ListCityScreenState extends State<ListCityScreen> {
             mainAxisSize: MainAxisSize.max,
             children: [
               const SizedBox(height: 25),
+              Consumer<ListCityController>(
+                builder: (context, controller, child) {
+                  return Row(
+                    children: [
+                      const Icon(Icons.public, color: Colors.white),
+                      const SizedBox(width: 8),
+                      Text(
+                        controller.deviceCountry.isEmpty
+                            ? '...'
+                            : controller.deviceCountry,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 15),
               TextField(
                 style: const TextStyle(color: Colors.white),
                 controller: textController,
@@ -66,6 +86,42 @@ class _ListCityScreenState extends State<ListCityScreen> {
                   builder: (context, controller, child) {
                     if (controller.isLoading) {
                       return const Center(child: CircularProgressIndicator());
+                    }
+                    if (controller.errorMessage.isNotEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.wifi_off,
+                              color: Colors.white,
+                              size: 48,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              controller.errorMessage,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () {
+                                controller.loadCities();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white24,
+                              ),
+                              child: const Text(
+                                'Tentar novamente',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
                     }
                     return ListView.builder(
                       itemCount: controller.filteredCities.length,

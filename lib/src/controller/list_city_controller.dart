@@ -38,19 +38,36 @@ class ListCityController extends ChangeNotifier {
 
     _deviceCountry = await deviceInfoService.getDeviceCountry();
 
+    const msgInternet = 'Deu ruim nas internet, vá botar crédito seu pobre';
+
     try {
       allCities = await weatherService.getWeatherForecast(listCitySearch);
       filteredCities = List.from(allCities);
     } on TimeoutException catch (e) {
-      errorMessage =
-          e.message ?? 'Deu ruim nas internet, vá botar crédito seu pobre';
+      errorMessage = e.message ?? msgInternet;
+      debugPrint('====================================');
+      debugPrint(errorMessage);
+      debugPrint('====================================');
+    } on SocketException {
+      errorMessage = msgInternet;
+      debugPrint('====================================');
+      debugPrint(errorMessage);
+      debugPrint('====================================');
+    } on http.ClientException {
+      errorMessage = msgInternet;
+      debugPrint('====================================');
+      debugPrint(errorMessage);
+      debugPrint('====================================');
     } on HttpException catch (e) {
       debugPrint('====================================');
       errorMessage = e.message;
       debugPrint(errorMessage);
       debugPrint('====================================');
     } catch (e) {
-      print(e);
+      errorMessage = e.toString();
+      debugPrint('====================================');
+      debugPrint(errorMessage);
+      debugPrint('====================================');
     } finally {
       isLoading = false;
       notifyListeners();
