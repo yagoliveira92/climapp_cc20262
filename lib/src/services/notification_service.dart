@@ -57,9 +57,46 @@ class NotificationService {
         if (context != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${notification.title}\n${notification.body}'),
-              backgroundColor: Colors.blueAccent,
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              elevation: 6,
+              backgroundColor: Colors.deepPurple.shade600,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               duration: const Duration(seconds: 4),
+              content: Row(
+                children: [
+                  const Icon(
+                    Icons.notifications_active_rounded,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          notification.title ?? 'Climapp',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        if (notification.body != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            notification.body!,
+                            style: const TextStyle(color: Colors.white70, fontSize: 14),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }

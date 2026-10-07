@@ -4,6 +4,8 @@ import 'package:climapp_cc20262/src/widgets/city_tile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/error_message_widget.dart';
+
 class ListCityScreen extends StatefulWidget {
   const ListCityScreen({super.key});
 
@@ -42,6 +44,16 @@ class _ListCityScreenState extends State<ListCityScreen> {
             mainAxisSize: MainAxisSize.max,
             children: [
               const SizedBox(height: 25),
+              Consumer<ListCityController>(
+                builder: (context, controller, _) {
+                  if (controller.isLoading) return const SizedBox.shrink();
+                  return Text(
+                    controller.deviceCountryLabel,
+                    style: const TextStyle(color: Colors.white70, fontSize: 16),
+                  );
+                },
+              ),
+              const SizedBox(height: 12),
               TextField(
                 style: const TextStyle(color: Colors.white),
                 controller: textController,
@@ -66,6 +78,12 @@ class _ListCityScreenState extends State<ListCityScreen> {
                   builder: (context, controller, child) {
                     if (controller.isLoading) {
                       return const Center(child: CircularProgressIndicator());
+                    }
+                    if (controller.errorMessage.isNotEmpty) {
+                      return ErrorMessageWidget(
+                        message: controller.errorMessage,
+                        onRetry: controller.loadCities,
+                      );
                     }
                     return ListView.builder(
                       itemCount: controller.filteredCities.length,

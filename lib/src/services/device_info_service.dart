@@ -10,9 +10,10 @@ class DeviceInfoService {
       final String? countryCode = await _channel.invokeMethod(
         'getDeviceCountry',
       );
-      return countryCode ?? "Deu Ruim";
-    } on PlatformException catch (e) {
-      return "Deu Ruim";
+      if (countryCode == null || countryCode.isEmpty) return "Unknown" ;
+      return countryCode;
+    } on PlatformException {
+      return "Unknown";
     }
   }
 }
