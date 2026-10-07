@@ -1,6 +1,7 @@
 import 'package:climapp_cc20262/src/controller/list_city_controller.dart';
 import 'package:climapp_cc20262/src/screens/weather_city_screen.dart';
 import 'package:climapp_cc20262/src/widgets/city_tile_widget.dart';
+import 'package:climapp_cc20262/src/widgets/no_connection_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -64,6 +65,9 @@ class _ListCityScreenState extends State<ListCityScreen> {
               Expanded(
                 child: Consumer<ListCityController>(
                   builder: (context, controller, child) {
+                    if (controller.hasConnectionError) {
+                      return NoConnectionWidget(onRetry: controller.loadCities);
+                    }
                     if (controller.isLoading) {
                       return const Center(child: CircularProgressIndicator());
                     }

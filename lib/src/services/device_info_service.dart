@@ -1,18 +1,6 @@
-import 'package:flutter/services.dart';
+import 'package:climapp_cc20262/src/utils/locale_helper.dart';
 
 class DeviceInfoService {
-  static const MethodChannel _channel = MethodChannel(
-    'br.dev.yago.climapp/device',
-  );
-
-  Future<String> getDeviceCountry() async {
-    try {
-      final String? countryCode = await _channel.invokeMethod(
-        'getDeviceCountry',
-      );
-      return countryCode ?? "Deu Ruim";
-    } on PlatformException catch (e) {
-      return "Deu Ruim";
-    }
-  }
+  /// País do usuário pela localização, com fallback para o idioma do aparelho.
+  Future<String> getDeviceCountry() => LocaleHelper.getCountryFromLocation();
 }

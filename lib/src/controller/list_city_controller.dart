@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:climapp_cc20262/src/enums/enviroments_enum.dart';
 import 'package:climapp_cc20262/src/models/weather_forecast_model.dart';
 import 'package:climapp_cc20262/src/services/device_info_service.dart';
 import 'package:climapp_cc20262/src/services/weather_service.dart';
@@ -24,6 +22,7 @@ class ListCityController extends ChangeNotifier {
   List<WeatherForecastModel> filteredCities = [];
   bool isLoading = true;
   String errorMessage = '';
+  bool hasConnectionError = false;
 
   final listCitySearch = [
     'Aracaju,SE',
@@ -34,6 +33,7 @@ class ListCityController extends ChangeNotifier {
   Future<void> loadCities() async {
     isLoading = true;
     errorMessage = '';
+    hasConnectionError = false;
     notifyListeners();
 
     _deviceCountry = await deviceInfoService.getDeviceCountry();
@@ -41,16 +41,20 @@ class ListCityController extends ChangeNotifier {
     try {
       allCities = await weatherService.getWeatherForecast(listCitySearch);
       filteredCities = List.from(allCities);
+    } on SocketException catch (_) {
+      hasConnectionError = true;
+    } on http.ClientException catch (_) {
+      hasConnectionError = true;
     } on TimeoutException catch (e) {
-      errorMessage =
-          e.message ?? 'Deu ruim nas internet, vá botar crédito seu pobre';
+      errorMessage = e.message ?? 'Tempo de resposta esgotado';
+      hasConnectionError = true;
     } on HttpException catch (e) {
-      debugPrint('====================================');
       errorMessage = e.message;
-      debugPrint(errorMessage);
-      debugPrint('====================================');
+      hasConnectionError = true;
     } catch (e) {
-      print(e);
+      // Resposta inválida: mostra a tela de tentar novamente.
+      debugPrint(e.toString());
+      hasConnectionError = true;
     } finally {
       isLoading = false;
       notifyListeners();

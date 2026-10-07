@@ -22,17 +22,17 @@ class WeatherService {
             const Duration(seconds: 5),
             onTimeout: () {
               throw TimeoutException(
-                "Deu ruim nas internet, vá botar crédito seu pobre",
+                "Tempo de resposta esgotado. Verifique sua conexão.",
               );
             },
           );
-      if (response.statusCode >= 200 || response.statusCode < 300) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         final jsonDecoded = jsonDecode(response.body)['results'];
         final model = WeatherForecastModel.fromJson(jsonDecoded);
         listCity.add(model);
       } else {
         throw HttpException(
-          'Deu ruim no HGBrasil, a culpa não é minha. Código: ${response.statusCode}',
+          'Erro no servidor de previsão do tempo. Código: ${response.statusCode}',
         );
       }
     }

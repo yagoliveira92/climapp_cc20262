@@ -1,5 +1,6 @@
 // lib/src/services/notification_service.dart
 import 'package:flutter/material.dart';
+import 'package:climapp_cc20262/src/screens/list_city_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class NotificationService {
@@ -57,8 +58,23 @@ class NotificationService {
         if (context != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${notification.title}\n${notification.body}'),
-              backgroundColor: Colors.blueAccent,
+              content: Row(
+                children: [
+                  const Icon(Icons.notifications, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      '${notification.title ?? ""}\n${notification.body ?? ""}'.trim(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: const Color(0xFF00457D),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               duration: const Duration(seconds: 4),
             ),
           );
@@ -82,10 +98,9 @@ class NotificationService {
   }
 
   void _handleDeepLink(RemoteMessage message) {
-    final city = message.data['city'];
-    if (city != null) {
-      // Navega diretamente para a tela de clima da cidade
-      navigatorKey.currentState?.pushNamed('/weather', arguments: city);
-    }
+    // Ao tocar na notificação, abre a lista de cidades.
+    navigatorKey.currentState?.push(
+      MaterialPageRoute(builder: (context) => const ListCityScreen()),
+    );
   }
 }
