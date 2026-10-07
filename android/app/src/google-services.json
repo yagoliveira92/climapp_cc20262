@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "676881753252",
+    "project_id": "pushmkiii",
+    "storage_bucket": "pushmkiii.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:676881753252:android:69029416c89b5101bb7231",
+        "android_client_info": {
+          "package_name": "br.dev.yago.climapp_cc20262"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKGePZRYZw3O6PVLJ15GfsXflnVXet-HI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
