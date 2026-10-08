@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 class CityTileWidget extends StatelessWidget {
   const CityTileWidget({
     required this.cityName,
+    required this.country,
     required this.icon,
     required this.temperature,
     required this.onTap,
@@ -12,6 +13,7 @@ class CityTileWidget extends StatelessWidget {
   });
 
   final String cityName;
+  final String country;
   final String icon;
   final int temperature;
   final VoidCallback onTap;
@@ -24,15 +26,26 @@ class CityTileWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
       ),
       margin: .symmetric(vertical: 10),
-      child: ListTile(
-        onTap: onTap,
-        leading: SvgPicture.network('${envEnum.IMAGE_URL}$icon.svg'),
-        titleTextStyle: TextStyle(fontSize: 20),
-        textColor: Colors.white,
-        title: Text(cityName, textAlign: .center),
-        trailing: Text(
-          '${temperature.toString()}°C',
-          style: TextStyle(color: Colors.white, fontSize: 25),
+      child: Material(
+        color: Colors.transparent,
+        child: ListTile(
+          onTap: onTap,
+          leading: SvgPicture.network('${envEnum.IMAGE_URL}$icon.svg'),
+          titleTextStyle: const TextStyle(fontSize: 20),
+          textColor: Colors.white,
+          title: Row(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    Text(cityName),
+    const SizedBox(width: 8),
+    Text(country, style: const TextStyle(fontSize: 16, color: Colors.white70)),
+  ],
+),
+
+          trailing: Text(
+            '${temperature.toString()}°C',
+            style: const TextStyle(color: Colors.white, fontSize: 25),
+          ),
         ),
       ),
     );

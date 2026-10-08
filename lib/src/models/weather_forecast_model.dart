@@ -8,6 +8,7 @@ class WeatherForecastModel {
   final String description;
   final String currently;
   final String city;
+  final String country;
   final String imgId;
   final int humidity;
   final double cloudiness;
@@ -31,6 +32,7 @@ class WeatherForecastModel {
     required this.description,
     required this.currently,
     required this.city,
+    required this.country,
     required this.imgId,
     required this.humidity,
     required this.cloudiness,
@@ -56,6 +58,7 @@ class WeatherForecastModel {
       'description': description,
       'currently': currently,
       'city': city,
+      'country': country,
       'img_id': imgId,
       'humidity': humidity,
       'cloudiness': cloudiness,
@@ -82,6 +85,7 @@ class WeatherForecastModel {
       description: json['description'],
       currently: json['currently'],
       city: json['city'],
+     country: json['results']?['country'] ?? '',
       imgId: json['img_id'].toString(),
       humidity: json['humidity'],
       cloudiness: json['cloudiness'].toDouble(),

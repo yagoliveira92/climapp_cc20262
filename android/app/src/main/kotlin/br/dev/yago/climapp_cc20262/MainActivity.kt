@@ -1,4 +1,4 @@
-package br.dev.yago.climapp_cc20262
+package br.dev.ananda.climapp_cc20262
 
 import android.content.Context
 import android.telephony.TelephonyManager
@@ -8,7 +8,7 @@ import io.flutter.plugin.common.MethodChannel
 import java.util.Locale
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "br.dev.yago.climapp/device"
+    private val CHANNEL = "br.dev.ananda.climapp_cc20262/device"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)

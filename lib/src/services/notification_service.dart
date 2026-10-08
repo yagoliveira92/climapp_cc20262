@@ -1,6 +1,8 @@
 // lib/src/services/notification_service.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
   // Instância singleton para acesso global
@@ -9,9 +11,108 @@ class NotificationService {
   NotificationService._internal();
 
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
 
   // Chave global para permitir navegação sem BuildContext
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  Future<void> initializeLocalNotifications() async {
+    const InitializationSettings settings = InitializationSettings(
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      iOS: DarwinInitializationSettings(
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+      ),
+      macOS: DarwinInitializationSettings(
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+      ),
+      linux: LinuxInitializationSettings(
+        defaultActionName: 'Abrir notificação',
+      ),
+      windows: WindowsInitializationSettings(
+        appName: 'Climapp',
+        appUserModelId: 'br.dev.yago.climapp_cc20262',
+        guid: '9f9d3eb4-7c68-4f20-91ad-651ced8f2463',
+      ),
+      web: WebInitializationSettings(),
+    );
+
+    await _localNotifications.initialize(settings: settings);
+  }
+
+  Future<void> showWeatherTestNotification({required String cityName}) async {
+    final bool? permissionGranted = await _requestNotificationPermission();
+    if (permissionGranted == false) return;
+
+    await _localNotifications.show(
+      id: 0,
+      title: 'Climapp',
+      body: 'Dados do clima de $cityName carregados.',
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'weather_updates',
+          'Atualizações do clima',
+          channelDescription: 'Avisos sobre a atualização do clima.',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+        macOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+    );
+  }
+
+  Future<bool?> _requestNotificationPermission() async {
+    if (kIsWeb) {
+      final WebFlutterLocalNotificationsPlugin? webPlugin =
+          _localNotifications.resolvePlatformSpecificImplementation<
+            WebFlutterLocalNotificationsPlugin
+          >();
+      if (webPlugin == null ||
+          webPlugin.permissionStatus == WebNotificationPermission.granted) {
+        return true;
+      }
+      return webPlugin.requestNotificationsPermission();
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return _localNotifications
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.requestNotificationsPermission();
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return _localNotifications
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >()
+          ?.requestPermissions(alert: true, badge: true, sound: true);
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.macOS) {
+      return _localNotifications
+          .resolvePlatformSpecificImplementation<
+            MacOSFlutterLocalNotificationsPlugin
+          >()
+          ?.requestPermissions(alert: true, badge: true, sound: true);
+    }
+
+    return true;
+  }
 
   Future<void> initialize() async {
     // 1. Solicitar permissões (Obrigatório para iOS e Android 13+)

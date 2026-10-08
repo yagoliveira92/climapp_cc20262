@@ -16,16 +16,22 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   debugPrint("Background Handler ID: ${message.messageId}");
 }
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint("Firebase já inicializado ou erro na inicialização: $e");
+  }
+
+  await NotificationService().initializeLocalNotifications();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  final notificationService = NotificationService();
-  await notificationService.initialize();
+
   runApp(const MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -44,6 +50,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Climapp',
+        navigatorKey: NotificationService().navigatorKey,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           textTheme: GoogleFonts.montserratTextTheme(

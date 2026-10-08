@@ -1,5 +1,7 @@
 import 'package:climapp_cc20262/src/enums/enviroments_enum.dart';
 import 'package:climapp_cc20262/src/models/weather_forecast_model.dart';
+import 'package:climapp_cc20262/src/services/notification_service.dart';
+import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -24,10 +26,26 @@ class _WeatherCityScreenState extends State<WeatherCityScreen> {
       appBar: AppBar(
         backgroundColor: Color(0xFF00457D),
         centerTitle: true,
-        title: Text(
-          widget.weatherForecastModel.cityName,
-          style: TextStyle(color: Colors.white, fontSize: 24),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.weatherForecastModel.cityName,
+              style: TextStyle(color: Colors.white, fontSize: 24),
+            ),
+            SizedBox(width: 8),
+            CountryFlag.fromCountryCode('BR', height: 20, width: 30),
+          ],
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Testar notificação',
+            icon: Icon(Icons.notifications_active_outlined),
+            onPressed: () => NotificationService().showWeatherTestNotification(
+              cityName: widget.weatherForecastModel.cityName,
+            ),
+          ),
+        ],
       ),
       body: DecoratedBox(
         decoration: BoxDecoration(
