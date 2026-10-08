@@ -16,13 +16,23 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+
+  // isOptional: não derruba o app se o .env não existir.
+  // A falta da chave é tratada no controller (mensagem de erro na tela).
+  await dotenv.load(fileName: '.env', isOptional: true);
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  final notificationService = NotificationService();
-  await notificationService.initialize();
+  // Notificações dependem de rede (token FCM). Se estiver offline, o app
+  // não pode ficar travado na abertura: segue sem notificações.
+  try {
+    await NotificationService().initialize().timeout(
+      const Duration(seconds: 5),
+    );
+  } catch (e) {
+    debugPrint('Falha ao iniciar notificações (offline?): $e');
+  }
 
   runApp(const MyApp());
 }
@@ -37,7 +47,10 @@ class MyApp extends StatelessWidget {
       title: 'Climapp',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        textTheme: GoogleFonts.montserratTextTheme(Theme.of(context).textTheme),
+        // Texto branco: todas as telas usam fundo escuro/azul.
+        textTheme: GoogleFonts.montserratTextTheme(
+          Theme.of(context).textTheme,
+        ).apply(bodyColor: Colors.white, displayColor: Colors.white),
       ),
       home: const WelcomeScreen(),
     );
