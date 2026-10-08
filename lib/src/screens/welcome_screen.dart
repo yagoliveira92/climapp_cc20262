@@ -1,5 +1,18 @@
 import 'package:climapp_cc20262/src/screens/list_city_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:climapp_cc20262/src/controller/list_city_controller.dart';
+
+String _flagForCountry(String countryCode) {
+  final normalizedCode = countryCode.trim().toUpperCase();
+  if (!RegExp(r'^[A-Z]{2}$').hasMatch(normalizedCode)) {
+    return '';
+  }
+  return String.fromCharCodes(
+    normalizedCode.codeUnits.map((letter) => letter + 0x1F1E6 - 0x41),
+  );
+}
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -23,9 +36,40 @@ class WelcomeScreen extends StatelessWidget {
               SizedBox(height: 30),
               Image.asset("assets/logo_climapp.png", width: 200),
               Image.asset("assets/ilustracao_home.png", width: 250),
-              Text(
-                'Boas-vindas!',
-                style: TextStyle(color: Colors.white, fontSize: 30),
+              Consumer<ListCityController>(
+                builder: (context, controller, child) {
+                  final countryCode = controller.deviceCountry
+                      .trim()
+                      .toUpperCase();
+                  final flag = _flagForCountry(countryCode);
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Boas-vindas!',
+                        style: TextStyle(color: Colors.white, fontSize: 30),
+                      ),
+                      if (flag.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(flag, style: const TextStyle(fontSize: 26)),
+                            const SizedBox(width: 8),
+                            Text(
+                              countryCode,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  );
+                },
               ),
               Spacer(),
               SizedBox(

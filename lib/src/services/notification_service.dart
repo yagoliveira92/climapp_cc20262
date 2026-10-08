@@ -8,12 +8,13 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  FirebaseMessaging get _fcm => FirebaseMessaging.instance;
 
   // Chave global para permitir navegação sem BuildContext
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   Future<void> initialize() async {
+    _setupMessageHandlers();
     // 1. Solicitar permissões (Obrigatório para iOS e Android 13+)
     NotificationSettings settings = await _fcm.requestPermission(
       alert: true,
@@ -35,9 +36,6 @@ class NotificationService {
       _fcm.onTokenRefresh.listen((newToken) {
         debugPrint('FCM Token atualizado: $newToken');
       });
-
-      // 3. Configurar os listeners de eventos
-      _setupMessageHandlers();
     } else {
       debugPrint('Permissão negada ou não configurada.');
     }
@@ -51,18 +49,30 @@ class NotificationService {
       );
 
       final notification = message.notification;
-      if (notification != null) {
-        // Exibe um alerta ou SnackBar utilizando o contexto global
-        final context = navigatorKey.currentContext;
-        if (context != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${notification.title}\n${notification.body}'),
-              backgroundColor: Colors.blueAccent,
-              duration: const Duration(seconds: 4),
+      final title =
+          notification?.title ??
+          message.data['title']?.toString() ??
+          'Notificação';
+      final body = notification?.body ?? message.data['body']?.toString() ?? '';
+      final context = navigatorKey.currentContext;
+      if (context != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                if (body.isNotEmpty) Text(body),
+              ],
             ),
-          );
-        }
+            backgroundColor: Colors.blueAccent,
+            duration: const Duration(seconds: 4),
+          ),
+        );
       }
     });
 

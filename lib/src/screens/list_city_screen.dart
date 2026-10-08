@@ -67,6 +67,47 @@ class _ListCityScreenState extends State<ListCityScreen> {
                     if (controller.isLoading) {
                       return const Center(child: CircularProgressIndicator());
                     }
+                    if (controller.errorMessage.isNotEmpty) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                controller.isConnectionError
+                                    ? Icons.wifi_off_rounded
+                                    : Icons.cloud_off_rounded,
+                                color: Colors.white,
+                                size: 48,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                controller.errorTitle,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                controller.errorMessage,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.white70),
+                              ),
+                              const SizedBox(height: 20),
+                              FilledButton.icon(
+                                onPressed: controller.loadCities,
+                                icon: const Icon(Icons.refresh),
+                                label: const Text('Tentar novamente'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
                     return ListView.builder(
                       itemCount: controller.filteredCities.length,
                       itemBuilder: (context, index) {
