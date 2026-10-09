@@ -23,6 +23,7 @@ class ListCityController extends ChangeNotifier {
   List<WeatherForecastModel> allCities = [];
   List<WeatherForecastModel> filteredCities = [];
   bool isLoading = true;
+  bool isOffline = false;
   String errorMessage = '';
 
   final listCitySearch = [
@@ -31,8 +32,12 @@ class ListCityController extends ChangeNotifier {
     'Salvador,BA',
     'Curitiba,PR',
   ];
+  static const _offlineMessage =
+      'Você está sem conexão com a internet. Verifique sua rede e tente novamente.';
+
   Future<void> loadCities() async {
     isLoading = true;
+    isOffline = false;
     errorMessage = '';
     notifyListeners();
 
@@ -41,20 +46,38 @@ class ListCityController extends ChangeNotifier {
     try {
       allCities = await weatherService.getWeatherForecast(listCitySearch);
       filteredCities = List.from(allCities);
-    } on TimeoutException catch (e) {
-      errorMessage =
-          e.message ?? 'Deu ruim nas internet, vá botar crédito seu pobre';
+    } on TimeoutException {
+      _setOffline();
+    } on SocketException {
+      _setOffline();
     } on HttpException catch (e) {
       debugPrint('====================================');
       errorMessage = e.message;
       debugPrint(errorMessage);
       debugPrint('====================================');
     } catch (e) {
-      print(e);
+      if (_isConnectionError(e)) {
+        _setOffline();
+      } else {
+        print(e);
+      }
     } finally {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  void _setOffline() {
+    isOffline = true;
+    errorMessage = _offlineMessage;
+  }
+
+  bool _isConnectionError(Object e) {
+    final text = e.toString().toLowerCase();
+    return text.contains('socketexception') ||
+        text.contains('failed host lookup') ||
+        text.contains('clientexception') ||
+        text.contains('network is unreachable');
   }
 
   void filterCities(String query) {
