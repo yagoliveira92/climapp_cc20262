@@ -21,13 +21,18 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  final notificationService = NotificationService();
-  await notificationService.initialize();
-  runApp(const MyApp());
+ final notificationService = NotificationService();
+await notificationService.initialize();
+runApp(MyApp(notificationService: notificationService));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({
+    super.key,
+    required this.notificationService,
+  });
+
+  final NotificationService notificationService;
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +47,10 @@ class MyApp extends StatelessWidget {
           )..loadCities(),
         ),
       ],
-      child: MaterialApp(
-        title: 'Climapp',
-        theme: ThemeData(
+     child: MaterialApp(
+       title: 'Climapp',
+       navigatorKey: notificationService.navigatorKey,
+       theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           textTheme: GoogleFonts.montserratTextTheme(
             Theme.of(context).textTheme,
@@ -55,3 +61,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
