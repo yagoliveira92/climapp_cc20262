@@ -55,6 +55,7 @@ class NotificationService {
         // Exibe um alerta ou SnackBar utilizando o contexto global
         final context = navigatorKey.currentContext;
         if (context != null) {
+          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('${notification.title}\n${notification.body}'),

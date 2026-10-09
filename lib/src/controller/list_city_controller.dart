@@ -1,13 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
+
 import 'dart:io';
 
-import 'package:climapp_cc20262/src/enums/enviroments_enum.dart';
 import 'package:climapp_cc20262/src/models/weather_forecast_model.dart';
 import 'package:climapp_cc20262/src/services/device_info_service.dart';
 import 'package:climapp_cc20262/src/services/weather_service.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
 
 class ListCityController extends ChangeNotifier {
   ListCityController({
@@ -16,6 +15,7 @@ class ListCityController extends ChangeNotifier {
   });
 
   final WeatherService weatherService;
+
   final DeviceInfoService deviceInfoService;
 
   String _deviceCountry = '';
@@ -36,9 +36,8 @@ class ListCityController extends ChangeNotifier {
     errorMessage = '';
     notifyListeners();
 
-    _deviceCountry = await deviceInfoService.getDeviceCountry();
-
     try {
+      _deviceCountry = await deviceInfoService.getDeviceCountry();
       allCities = await weatherService.getWeatherForecast(listCitySearch);
       filteredCities = List.from(allCities);
     } on TimeoutException catch (e) {
@@ -49,8 +48,13 @@ class ListCityController extends ChangeNotifier {
       errorMessage = e.message;
       debugPrint(errorMessage);
       debugPrint('====================================');
+    } on SocketException {
+      
+      errorMessage = 'Parece que você está sem conexão com a internet. Verifique sua rede Wi-Fi ou dados móveis e tente novamente.';
     } catch (e) {
-      print(e);
+      debugPrint('Erro não tratado: $e');
+      
+      errorMessage = 'Parece que você está sem conexão com a internet. Verifique sua rede Wi-Fi ou dados móveis e tente novamente.';
     } finally {
       isLoading = false;
       notifyListeners();
